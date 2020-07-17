@@ -7,6 +7,9 @@ use it like this!
 ```shell script
 ![ViewCount](https://views.whatilearened.today/views/github/<user>/<repo>.svg)
 ```
+
+`![ViewCount](https://views.whatilearened.today/views/github/wesky93/views.svg)`
+
 ![ViewCount](https://views.whatilearened.today/views/github/wesky93/views.svg)
 
 ## Is it Free?
