@@ -90,8 +90,8 @@ def get_repo(repo: str) -> Optional[str]:
     return
 
 
-def make_etag(content:str):
-    return hashlib.md5(f"{content}".encode('utf-8')).hexdigest
+def make_etag(content: str):
+    return hashlib.md5(f"{content}".encode('utf-8')).hexdigest()
 
 
 @app.route('/views/github/{user}/{repo}', methods=['GET'], cors=True)
@@ -109,14 +109,16 @@ def get_github_svg(user: str, repo: str):
             }
         )
         badge = make_badge(total_views)
-        # e_tag = make_etag(badge)
+        e_tag = make_etag(badge)
         return Response(
             body=badge,
             status_code=200,
             headers={
                 'Content-Type': 'image/svg+xml',
-                "Cache-Control": 'no-store',
-                # "ETag": e_tag
+                "Cache-Control": 'no-cache, no-store, must-revalidate',
+                "Pragma": 'no-cache',
+                "Expires": '0',
+                "ETag": e_tag,
             })
     else:
         return Response(
