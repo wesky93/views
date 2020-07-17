@@ -1,0 +1,35 @@
+#name: Deploy prod
+#
+#on:
+#  push:
+#    branchs: [master]
+#
+#jobs:
+#  deploy:
+#
+#    runs-on: ubuntu-latest
+#
+#    steps:
+#    - uses: actions/checkout@v2
+#    - name: Set up Python
+#      uses: actions/setup-python@v2
+#      with:
+#        python-version: '3.x'
+#    - name: Install dependencies
+#      run: |
+#        python -m pip install --upgrade pip
+#        pip install -r requirements-dev.txt
+#    - name: Lint with flake8
+#      run: |
+#        flake8 . --count --show-source --statistics
+#    - name: Test with pytest
+#      run: pytest
+#    - name: Upload coverage to Codecov
+#      uses: codecov/codecov-action@v1
+#    - name: Build and publish
+#      env:
+#        TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
+#        TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+#      run: |
+#        python setup.py sdist bdist_wheel
+#        twine upload dist/*
