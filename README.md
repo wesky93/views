@@ -10,7 +10,7 @@ use it like this!
 
 `![ViewCount](https://views.whatilearened.today/views/github/wesky93/views.svg)`
 
-![ViewCount](https://views.whatilearened.today/views/github/wesky93/views.svg)
+![ViewCount](https://views.whatilearened.today/views/github/wesky93/views.svg?cache=remove)
 
 
 ## Is it Free?
