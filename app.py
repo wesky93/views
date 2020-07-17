@@ -1,3 +1,4 @@
+import logging
 import os
 from datetime import datetime
 from random import randint
@@ -8,6 +9,14 @@ from chalice import Chalice, Response
 from pybadges import badge
 from pynamodb.attributes import UnicodeAttribute, NumberAttribute, UTCDateTimeAttribute
 from pynamodb.models import Model
+from pythonjsonlogger import jsonlogger
+
+logger = logging.getLogger()
+
+logHandler = logging.StreamHandler()
+formatter = jsonlogger.JsonFormatter()
+logHandler.setFormatter(formatter)
+logger.addHandler(logHandler)
 
 app = Chalice(app_name='views')
 VIEW_TABLE_NAME = os.environ.get('VIEW_TABLE_NAME', 'ViewsCountTable_dev')
@@ -85,6 +94,15 @@ def get_github_svg(user: str, repo: str):
     if repo := get_repo(repo):
         page = GithubViewTable.get_page(user, repo)
         total_views = GithubViewTable.patch_total_views(page)
+        logger.info(
+            "view history",
+            extra={
+                "service": "github",
+                "user": user, "repo": repo,
+                "total_views": total_views,
+                "view_at": datetime.utcnow()
+            }
+        )
         return Response(
             body=make_badge(total_views),
             status_code=200,
