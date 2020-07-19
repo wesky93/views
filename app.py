@@ -1,26 +1,37 @@
 import hashlib
-import logging
+import json
 import os
 from datetime import datetime
 from random import randint
 from typing import Optional
 
+import boto3
 import shortuuid
 from chalice import Chalice, Response
 from pybadges import badge
 from pynamodb.attributes import UnicodeAttribute, NumberAttribute, UTCDateTimeAttribute
 from pynamodb.models import Model
-from pythonjsonlogger import jsonlogger
-
-logger = logging.getLogger()
-
-logHandler = logging.StreamHandler()
-formatter = jsonlogger.JsonFormatter()
-logHandler.setFormatter(formatter)
-logger.addHandler(logHandler)
 
 app = Chalice(app_name='views')
 VIEW_TABLE_NAME = os.environ.get('VIEW_TABLE_NAME', 'ViewsCountTable_dev')
+LOG_STREAM = os.environ.get('LOG_STREAM', 'views_log_stream_dev')
+firehose = boto3.client('firehose', region_name='us-east-1')
+
+
+def json_default(value):
+    if isinstance(value, datetime):
+        return value.isoformat()
+    return f"{value}"
+
+
+def request_logging(data: dict):
+    json_data = json.dumps(data, default=json_default, ensure_ascii=False)
+    firehose.put_record(
+        DeliveryStreamName=LOG_STREAM,
+        Record={
+            'Data': json_data
+        }
+    )
 
 
 class ViewTable(Model):
@@ -99,15 +110,20 @@ def get_github_svg(user: str, repo: str):
     if repo := get_repo(repo):
         page = GithubViewTable.get_page(user, repo)
         total_views = GithubViewTable.patch_total_views(page)
-        logger.info(
-            "view history",
-            extra={
-                "service": "github",
-                "user": user, "repo": repo,
-                "total_views": total_views,
-                "view_at": datetime.utcnow()
-            }
-        )
+        history = {
+            "service": "github",
+            "user": user, "repo": repo,
+            "total_views": total_views,
+            "view_at": datetime.utcnow(),
+            "request": app.current_request.to_dict()
+        }
+        print(history)
+        try:
+            request_logging(history)
+        except Exception as e:
+            print('history lof fail')
+            print(e)
+
         badge = make_badge(total_views)
         e_tag = make_etag(badge)
         return Response(

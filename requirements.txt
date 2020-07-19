@@ -2,3 +2,4 @@ pybadges==2.2.1
 shortuuid==1.0.1
 pynamodb==4.3.2
 python-json-logger==0.1.11
+boto3~=1.14.23
