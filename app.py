@@ -60,7 +60,7 @@ class ViewTable(Model):
     @classmethod
     def patch_total_views(cls, page) -> int:
         page.update(actions=[
-            cls.total_views.set(cls.total_views + 1),
+            cls.total_views.add(1),
             cls.last_updated.set(datetime.utcnow())
         ])
         return page.total_views
