@@ -51,6 +51,9 @@ resource "aws_kinesis_firehose_delivery_stream" "log_stream" {
   s3_configuration {
     role_arn = aws_iam_role.firehose_role.arn
     bucket_arn = aws_s3_bucket.log.arn
+    compression_format = "GZIP"
+    buffer_interval = 900
+    buffer_size = 128
   }
 }
 
